@@ -1,18 +1,50 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter, Instrument_Serif, Bricolage_Grotesque} from "next/font/google";
 import "./globals.css";
 import StoreProvider from "@/components/StoreProvider";
-
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Exam Portal | AI-Powered Exam Analysis",
-  description: "Upload and analyze exam papers with AI-driven structuring and LaTeX rendering.",
-};
-
-import Sidebar from "@/components/Sidebar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import AppShell from "@/components/AppShell";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument"
+});
+
+const bricolage = Bricolage_Grotesque({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bricolage"
+});
+
+export const metadata: Metadata = {
+  title: "Ŋwà' Exam Portal",
+  description: "AI-Powered Exam Paper Management & Study Platform for GCE students.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Ŋwà'",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: "/icons/icon-512x512.png",
+    apple: "/icons/icon-192x192.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#22C55E",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
 
 export default function RootLayout({
   children,
@@ -21,9 +53,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-background text-foreground min-h-screen selection:bg-green-500/30 overflow-hidden`}>
+      <head>
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="mobile-web-app-capable" content="yes" />
+      </head>
+      <body className={`${inter.variable} ${instrumentSerif.variable} ${bricolage.variable} font-sans bg-background text-foreground min-h-screen selection:bg-primary/30 overflow-x-hidden`}>
         <StoreProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+            <ServiceWorkerRegistration />
             <AppShell>{children}</AppShell>
           </ThemeProvider>
         </StoreProvider>

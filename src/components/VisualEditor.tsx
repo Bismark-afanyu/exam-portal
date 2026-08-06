@@ -73,7 +73,7 @@ export default function VisualEditor() {
                             type="text"
                             value={data.subject}
                             onChange={(e) => updateData({ subject: e.target.value })}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm text-foreground focus:outline-none focus:border-green-500/50 transition-colors"
+                            className="w-full bg-muted/50 border border-border-subtle rounded-2xl px-5 py-3 text-sm text-foreground focus:outline-none focus:border-green-500/50 transition-colors"
                         />
                     </div>
                     <div className="space-y-1.5">
@@ -82,7 +82,7 @@ export default function VisualEditor() {
                             type="text"
                             value={data.level}
                             onChange={(e) => updateData({ level: e.target.value })}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm text-foreground focus:outline-none focus:border-green-500/50 transition-colors"
+                            className="w-full bg-muted/50 border border-border-subtle rounded-2xl px-5 py-3 text-sm text-foreground focus:outline-none focus:border-green-500/50 transition-colors"
                         />
                     </div>
                     <div className="space-y-1.5">
@@ -91,7 +91,7 @@ export default function VisualEditor() {
                             type="number"
                             value={data.year}
                             onChange={(e) => updateData({ year: parseInt(e.target.value) || 0 })}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm text-foreground focus:outline-none focus:border-green-500/50 transition-colors"
+                            className="w-full bg-muted/50 border border-border-subtle rounded-2xl px-5 py-3 text-sm text-foreground focus:outline-none focus:border-green-500/50 transition-colors"
                         />
                     </div>
                     <div className="space-y-1.5">
@@ -100,7 +100,7 @@ export default function VisualEditor() {
                             type="number"
                             value={data.paper}
                             onChange={(e) => updateData({ paper: parseInt(e.target.value) || 0 })}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm text-foreground focus:outline-none focus:border-green-500/50 transition-colors"
+                            className="w-full bg-muted/50 border border-border-subtle rounded-2xl px-5 py-3 text-sm text-foreground focus:outline-none focus:border-green-500/50 transition-colors"
                         />
                     </div>
                 </div>
@@ -111,7 +111,7 @@ export default function VisualEditor() {
                 <div className="flex items-center gap-2 text-green-500 font-bold text-xs uppercase tracking-widest px-1">
                     <BookOpen size={14} /> Knowledge Areas
                 </div>
-                <div className="glass p-6 rounded-[2rem] border border-white/5 space-y-4 bg-black/20">
+                <div className="glass p-6 rounded-[2rem] border border-border-subtle space-y-4 bg-muted">
                     <div className="flex gap-2">
                         <input
                             type="text"
@@ -119,11 +119,11 @@ export default function VisualEditor() {
                             onChange={(e) => setNewTopic(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleTopicAdd()}
                             placeholder="Add a new topic..."
-                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none focus:border-green-500/50"
+                            className="flex-1 bg-muted/50 border border-border-subtle rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none focus:border-green-500/50"
                         />
                         <button
                             onClick={handleTopicAdd}
-                            className="px-4 py-2 bg-green-500 text-black text-xs font-black uppercase rounded-xl hover:bg-green-600 transition-colors"
+                            className="px-4 py-2 bg-primary text-white text-xs font-black uppercase rounded-xl hover:opacity-90 transition-colors"
                         >
                             Add
                         </button>
@@ -152,7 +152,7 @@ export default function VisualEditor() {
                     </div>
                     <button
                         onClick={addQuestion}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-black text-[10px] font-black uppercase rounded-lg hover:bg-green-600 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-[10px] font-black uppercase rounded-lg hover:opacity-90 transition-colors"
                     >
                         <Plus size={12} strokeWidth={3} /> Add Question
                     </button>
@@ -164,7 +164,7 @@ export default function VisualEditor() {
                             key={idx}
                             className={cn(
                                 "glass border transition-all duration-300 overflow-hidden rounded-[1.5rem]",
-                                expandedQuestion === idx ? "border-green-500/30 scale-[1.01]" : "border-white/5 hover:border-white/10"
+                                expandedQuestion === idx ? "border-green-500/30 scale-[1.01]" : "border-border-subtle hover:border-border-subtle"
                             )}
                         >
                             {/* Summary / Header */}
@@ -208,7 +208,7 @@ export default function VisualEditor() {
                                                 type="text"
                                                 value={q.question_number}
                                                 onChange={(e) => handleQuestionUpdate(idx, { question_number: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none"
+                                                className="w-full bg-muted/50 border border-border-subtle rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
@@ -217,7 +217,7 @@ export default function VisualEditor() {
                                                 type="number"
                                                 value={q.marks_total}
                                                 onChange={(e) => handleQuestionUpdate(idx, { marks_total: parseInt(e.target.value) || 0 })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none"
+                                                className="w-full bg-muted/50 border border-border-subtle rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
@@ -226,7 +226,7 @@ export default function VisualEditor() {
                                                 type="text"
                                                 value={q.topic}
                                                 onChange={(e) => handleQuestionUpdate(idx, { topic: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none"
+                                                className="w-full bg-muted/50 border border-border-subtle rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
@@ -235,7 +235,7 @@ export default function VisualEditor() {
                                                 type="text"
                                                 value={q.subtopic}
                                                 onChange={(e) => handleQuestionUpdate(idx, { subtopic: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none"
+                                                className="w-full bg-muted/50 border border-border-subtle rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none"
                                             />
                                         </div>
                                     </div>
@@ -245,7 +245,7 @@ export default function VisualEditor() {
                                         <textarea
                                             value={q.question_text}
                                             onChange={(e) => handleQuestionUpdate(idx, { question_text: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-foreground h-32 focus:outline-none resize-none"
+                                            className="w-full bg-muted/50 border border-border-subtle rounded-xl px-4 py-3 text-sm text-foreground h-32 focus:outline-none resize-none"
                                             placeholder="Enter question text here..."
                                         />
                                     </div>
@@ -266,7 +266,7 @@ export default function VisualEditor() {
                                         </div>
                                         <div className="space-y-2">
                                             {q.subquestions?.map((sq, sidx) => (
-                                                <div key={sidx} className="bg-white/5 border border-white/10 p-3 rounded-xl flex gap-3 items-start group/sub">
+                                                <div key={sidx} className="bg-muted/50 border border-border-subtle p-3 rounded-xl flex gap-3 items-start group/sub">
                                                     <input
                                                         type="text"
                                                         value={sq.subquestion_identifier}
@@ -276,7 +276,7 @@ export default function VisualEditor() {
                                                             handleQuestionUpdate(idx, { subquestions: news });
                                                         }}
                                                         placeholder="id"
-                                                        className="w-12 bg-black/20 border border-white/5 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                                                        className="w-12 bg-muted border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
                                                     />
                                                     <textarea
                                                         value={sq.text}
@@ -286,7 +286,7 @@ export default function VisualEditor() {
                                                             handleQuestionUpdate(idx, { subquestions: news });
                                                         }}
                                                         placeholder="Part text..."
-                                                        className="flex-1 bg-black/20 border border-white/5 rounded-lg px-3 py-1.5 text-xs h-16 focus:outline-none resize-none"
+                                                        className="flex-1 bg-muted border border-border-subtle rounded-lg px-3 py-1.5 text-xs h-16 focus:outline-none resize-none"
                                                     />
                                                     <div className="flex flex-col gap-2">
                                                         <input
@@ -298,7 +298,7 @@ export default function VisualEditor() {
                                                                 handleQuestionUpdate(idx, { subquestions: news });
                                                             }}
                                                             placeholder="Mks"
-                                                            className="w-16 bg-black/20 border border-white/5 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                                                            className="w-16 bg-muted border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
                                                         />
                                                         <button
                                                             onClick={() => {

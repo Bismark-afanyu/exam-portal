@@ -1,19 +1,42 @@
-import axios from 'axios';
 import { ExamPaperData } from '@/lib/features/exam/examSlice';
+import { apiClient } from '@/services/authService';
 
-const API_BASE_URL = 'http://localhost:8000/api/v1/exams';
+export class DuplicateExamError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'DuplicateExamError';
+    }
+}
 
 export const examService = {
-    /**
-     * Saves the full exam data including associations and images to the database
-     */
     saveExam: async (examData: ExamPaperData) => {
         try {
-            const response = await axios.post(`${API_BASE_URL}/save`, examData);
+            const response = await apiClient.post('/exams/save', examData);
             return response.data;
         } catch (error: any) {
-            console.error('Error saving exam data:', error);
-            throw new Error(error.response?.data?.message || 'Failed to save exam to database');
+            if (error.response?.status === 409) {
+                const detail = error.response?.data?.detail || 'This exam already exists in the database.';
+                throw new DuplicateExamError(detail);
+            }
+            const detail = error.response?.data?.detail || error.message;
+            throw new Error(detail || 'Failed to save exam to database');
         }
-    }
+    },
+
+    uploadPdf: async (subject: string, year: number, paper: number, file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const safeSubject = subject.toLowerCase().replace(/\s+/g, '_');
+        const response = await apiClient.post(
+            `/exams/${safeSubject}/${year}/${paper}/pdf`,
+            formData,
+            { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+        return response.data.pdf_url as string;
+    },
+
+    listExams: async () => {
+        const response = await apiClient.get('/exams/');
+        return response.data as { subject: string; year: number; paper: number; pdf_url: string | null }[];
+    },
 };

@@ -97,7 +97,7 @@ export default function SelectionCanvas({ imageSrc, onSelectionComplete }: Selec
   const stageHeight = image.height * scale;
 
   return (
-    <div className="border border-white/10 rounded-2xl overflow-hidden glass bg-black/40">
+    <div className="border border-white/10 rounded-2xl overflow-auto custom-scrollbar glass bg-black/40 max-w-full">
       <Stage
         width={stageWidth}
         height={stageHeight}

@@ -1,11 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
 import examReducer from './features/exam/examSlice';
+import userReducer from './features/user/userSlice';
+import { examApi } from './features/exam/examApi';
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
             exam: examReducer,
+            user: userReducer,
+            [examApi.reducerPath]: examApi.reducer,
         },
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware().concat(examApi.middleware),
     });
 };
 

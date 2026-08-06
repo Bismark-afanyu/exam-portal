@@ -2,6 +2,9 @@
 @import "katex/dist/katex.min.css";
 
 @theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument), serif;
+  
   --color-background: var(--bg);
   --color-foreground: var(--fg);
   --color-primary: var(--primary-color);
@@ -9,70 +12,79 @@
   --color-accent: var(--accent-color);
   --color-card-bg: var(--card-background);
   --color-border-subtle: var(--border-color);
+  --color-muted-fg: var(--muted-fg);
+  --color-muted: var(--muted);
 }
 
 :root {
-  --bg: #ffffff;
-  --fg: #0f172a;
-  --primary-color: #22c55e;
-  --secondary-color: #f8fafc;
-  --accent-color: #10b981;
-  --muted: #f1f5f9;
-  --muted-fg: #64748b;
-  --card-background: rgba(241, 245, 249, 0.6);
-  --border-color: rgba(0, 0, 0, 0.05);
-  --glass-bg: rgba(255, 255, 255, 0.7);
+  --bg: #F8FAFC;
+  --fg: #0F172A;
+  --primary-color: #0D9488;
+  --secondary-color: #FFFFFF;
+  --accent-color: #2563EB;
+  --muted: #F1F5F9;
+  --muted-fg: #64748B;
+  --card-background: #FFFFFF;
+  --border-color: #E2E8F0;
+  --glass-bg: #FFFFFF;
 }
 
 .dark {
-  --bg: #000000;
-  --fg: #f8fafc;
-  --primary-color: #22c55e;
-  --secondary-color: #0f172a;
-  --accent-color: #10b981;
-  --muted: #1e293b;
-  --muted-fg: #94a3b8;
-  --card-background: rgba(15, 23, 42, 0.4);
-  --border-color: rgba(255, 255, 255, 0.05);
-  --glass-bg: rgba(15, 23, 42, 0.4);
+  --bg: #0F172A;
+  --fg: #F8FAFC;
+  --primary-color: #14B8A6;
+  --secondary-color: #1E293B;
+  --accent-color: #3B82F6;
+  --muted: #1E293B;
+  --muted-fg: #94A3B8;
+  --card-background: #1E293B;
+  --border-color: #334155;
+  --glass-bg: #1E293B;
 }
 
 @layer base {
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
-    background-image:
-      radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
-    background-attachment: fixed;
+    @apply bg-background text-foreground transition-colors duration-300 font-sans;
     min-height: 100vh;
+  }
+
+  h1, h2, h3, h4 {
+    @apply tracking-tight leading-tight;
   }
 }
 
 @layer utilities {
+  .card-shadow {
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  }
+
+  .card-shadow-hover {
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .card-shadow-hover:hover {
+    box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+    transform: translateY(-1px);
+  }
+
   .glass {
-    @apply bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--border-color)] shadow-2xl;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-linear-to-br from-foreground to-green-500;
-  }
-
-  .premium-shadow {
-    box-shadow: 0 4px 14px 0 rgba(34, 197, 94, 0.15);
-  }
-
-  .premium-shadow-hover {
-    box-shadow: 0 6px 20px 0 rgba(34, 197, 94, 0.25);
+    @apply bg-clip-text text-transparent bg-linear-to-br from-foreground to-teal-500;
   }
 }
 
-/* Custom animations since Tailwind 4 handles them differently */
+/* Custom animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -80,5 +92,27 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-fg/20 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-fg/30;
+}
+
+/* iPhone safe area for bottom nav */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }

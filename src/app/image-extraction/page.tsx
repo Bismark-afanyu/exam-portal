@@ -25,6 +25,7 @@ export default function ImageExtractionPage() {
     const [selectedQuestion, setSelectedQuestion] = useState<string>('');
     const [isSaving, setIsSaving] = useState(false);
     const [isRecovering, setIsRecovering] = useState(false);
+    const [isLinkerOpen, setIsLinkerOpen] = useState(true);
     
     useEffect(() => {
         const attemptRecovery = async () => {
@@ -124,7 +125,7 @@ export default function ImageExtractionPage() {
                 </div>
                 <button
                     onClick={() => router.push('/new-extraction')}
-                    className="px-8 py-3 bg-green-500 text-black font-bold rounded-2xl hover:bg-green-600 transition-colors"
+                    className="px-8 py-3 bg-primary text-white font-bold rounded-2xl hover:opacity-90 transition-colors"
                 >
                     Return to Upload
                 </button>
@@ -141,20 +142,37 @@ export default function ImageExtractionPage() {
                     </h1>
                     <p className="text-muted-fg font-medium">Extract diagrams and link them to questions</p>
                 </div>
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 text-slate-100 font-semibold rounded-2xl border border-white/10 transition-all active:scale-95"
-                >
-                    <ChevronLeft size={18} />
-                    Back to Results
-                </button>
+                <div className="flex items-center gap-3">
+                    {!isLinkerOpen && (
+                        <button
+                            onClick={() => setIsLinkerOpen(true)}
+                            className="flex items-center gap-2 px-6 py-3 bg-green-500/10 hover:bg-green-500/20 text-green-500 font-semibold rounded-2xl border border-green-500/20 transition-all active:scale-95"
+                        >
+                            <LinkIcon size={18} />
+                            Open Linker
+                        </button>
+                    )}
+                    <button
+                        onClick={() => router.back()}
+                        className="flex items-center gap-2 px-6 py-3 bg-muted/50 hover:bg-muted text-foreground font-semibold rounded-2xl border border-border-subtle transition-all active:scale-95"
+                    >
+                        <ChevronLeft size={18} />
+                        Back to Results
+                    </button>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className={cn(
+                "grid grid-cols-1 gap-8 transition-all duration-500",
+                isLinkerOpen ? "xl:grid-cols-3" : "xl:grid-cols-1"
+            )}>
                 {/* Left: PDF Viewer & Selection */}
-                <div className="xl:col-span-2 space-y-6">
-                    <div className="glass p-6 rounded-[2rem] border border-white/5 space-y-6">
-                        <div className="flex justify-between items-center bg-black/20 p-4 rounded-2xl">
+                <div className={cn(
+                    "space-y-6 transition-all duration-500",
+                    isLinkerOpen ? "xl:col-span-2" : "xl:col-span-1"
+                )}>
+                    <div className="glass p-6 rounded-[2rem] border border-border-subtle space-y-6">
+                        <div className="flex justify-between items-center bg-muted p-4 rounded-2xl">
                             <div className="font-bold text-sm uppercase tracking-widest text-muted-fg">
                                 Page {currentPage + 1} of {pageImages.length}
                             </div>
@@ -162,14 +180,14 @@ export default function ImageExtractionPage() {
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                                     disabled={currentPage === 0}
-                                    className="p-2 hover:bg-white/5 rounded-xl disabled:opacity-30"
+                                    className="p-2 hover:bg-muted rounded-xl disabled:opacity-30"
                                 >
                                     <ChevronLeft size={24} />
                                 </button>
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.min(pageImages.length - 1, prev + 1))}
                                     disabled={currentPage === pageImages.length - 1}
-                                    className="p-2 hover:bg-white/5 rounded-xl disabled:opacity-30"
+                                    className="p-2 hover:bg-muted rounded-xl disabled:opacity-30"
                                 >
                                     <ChevronRight size={24} />
                                 </button>
@@ -182,12 +200,12 @@ export default function ImageExtractionPage() {
                                 <p className="text-muted-fg font-medium">Recovering PDF session...</p>
                             </div>
                         ) : pageImages.length > 0 ? (
-                            <div className="relative flex justify-center bg-black/40 rounded-2xl p-4 overflow-hidden min-h-[500px]">
+                            <div className="relative flex justify-center bg-muted rounded-2xl p-4 overflow-auto custom-scrollbar min-h-[500px] max-h-[75vh]">
                                 <SelectionCanvas 
                                     imageSrc={pageImages[currentPage]} 
                                     onSelectionComplete={handleSelectionComplete}
                                 />
-                                <div className="absolute top-8 right-8 pointer-events-none">
+                                <div className="absolute top-8 right-8 pointer-events-none z-10">
                                     <div className="px-4 py-2 bg-green-500 text-black text-xs font-black uppercase tracking-tighter rounded-full shadow-xl shadow-green-500/20">
                                         Drag to select
                                     </div>
@@ -200,15 +218,25 @@ export default function ImageExtractionPage() {
                 </div>
 
                 {/* Right: Linker Controls */}
-                <div className="space-y-6">
-                    <div className="glass p-8 rounded-[2rem] border border-white/5 sticky top-8 space-y-8">
-                        <div>
-                            <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                                <LinkIcon size={20} className="text-green-500" />
-                                Image Linking
-                            </h3>
-                            <p className="text-sm text-muted-fg">Select a question to attach current selection</p>
-                        </div>
+                {isLinkerOpen && (
+                    <div className="space-y-6 animate-in slide-in-from-right-8 fade-in duration-500">
+                        <div className="glass p-8 rounded-[2rem] border border-border-subtle sticky top-8 space-y-8">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+                                        <LinkIcon size={20} className="text-green-500" />
+                                        Image Linking
+                                    </h3>
+                                    <p className="text-sm text-muted-fg">Select a question to attach current selection</p>
+                                </div>
+                                <button 
+                                    onClick={() => setIsLinkerOpen(false)}
+                                    className="p-2 hover:bg-muted rounded-full text-muted-fg hover:text-foreground transition-colors"
+                                    title="Close Panel"
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
+                            </div>
 
                         <div className="space-y-4">
                             <label className="text-xs font-black uppercase tracking-widest text-muted-fg block">
@@ -217,7 +245,7 @@ export default function ImageExtractionPage() {
                             <select
                                 value={selectedQuestion}
                                 onChange={(e) => setSelectedQuestion(e.target.value)}
-                                className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-4 text-foreground focus:ring-2 focus:ring-green-500/50 transition-all appearance-none cursor-pointer"
+                                className="w-full bg-muted border border-border-subtle rounded-2xl px-4 py-4 text-foreground focus:ring-2 focus:ring-green-500/50 transition-all appearance-none cursor-pointer"
                             >
                                 <option value="">Select a question...</option>
                                 {data?.questions.map((q) => (
@@ -228,14 +256,14 @@ export default function ImageExtractionPage() {
                             </select>
                         </div>
 
-                        <div className="pt-4 border-t border-white/5">
+                        <div className="pt-4 border-t border-border-subtle">
                             <button
                                 onClick={handleSaveAssociation}
                                 disabled={!currentSelection || !selectedQuestion || isSaving}
                                 className={cn(
                                     "w-full py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 active:scale-[0.98]",
                                     (!currentSelection || !selectedQuestion)
-                                        ? "bg-white/5 text-muted-fg border border-white/10 cursor-not-allowed"
+                                        ? "bg-muted/50 text-muted-fg border border-border-subtle cursor-not-allowed"
                                         : "bg-green-500 text-black shadow-lg shadow-green-500/20 hover:bg-green-600"
                                 )}
                             >
@@ -251,14 +279,14 @@ export default function ImageExtractionPage() {
                         </div>
 
                         {/* Summary of associations */}
-                        <div className="space-y-4 pt-4 border-t border-white/5">
+                        <div className="space-y-4 pt-4 border-t border-border-subtle">
                             <h4 className="text-xs font-black uppercase tracking-widest text-muted-fg">
                                 Current Associations ({Object.keys(imageAssociations).length})
                             </h4>
                             <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                 {Object.entries(imageAssociations).map(([qNum, imgData]) => (
-                                    <div key={qNum} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 group">
-                                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-black flex-shrink-0 border border-white/10 group-hover:border-green-500/30 transition-colors">
+                                    <div key={qNum} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl border border-border-subtle group">
+                                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-foreground/10 flex-shrink-0 border border-border-subtle group-hover:border-primary/30 transition-colors">
                                             <img src={imgData as string} alt={`Q${qNum}`} className="w-full h-full object-cover" />
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -267,7 +295,7 @@ export default function ImageExtractionPage() {
                                         </div>
                                         <button 
                                             onClick={() => window.open(imgData, '_blank')}
-                                            className="p-2 hover:bg-white/10 rounded-lg text-muted-fg hover:text-foreground"
+                                            className="p-2 hover:bg-muted rounded-lg text-muted-fg hover:text-foreground"
                                         >
                                             <CheckCircle2 size={16} />
                                         </button>
@@ -282,6 +310,7 @@ export default function ImageExtractionPage() {
                         </div>
                     </div>
                 </div>
+                )}
             </div>
         </div>
     );

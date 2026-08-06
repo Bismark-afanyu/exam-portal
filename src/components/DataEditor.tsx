@@ -42,13 +42,13 @@ export default function DataEditor() {
     return (
         <div className="flex flex-col h-full glass rounded-[2.5rem] border border-white/5 overflow-hidden animate-fade-in shadow-2xl relative">
             {/* Mode Switcher Header */}
-            <div className="flex items-center justify-between p-2 bg-black/40 border-b border-border-subtle shrink-0">
-                <div className="flex p-1 bg-white/5 rounded-2xl w-fit">
+            <div className="flex items-center justify-between p-2 bg-muted border-b border-border-subtle shrink-0">
+                <div className="flex p-1 bg-muted/50 rounded-2xl w-fit">
                     <button
                         onClick={() => setMode('visual')}
                         className={cn(
                             "flex items-center gap-2 px-6 py-2 rounded-xl text-xs font-black transition-all",
-                            mode === 'visual' ? "bg-green-500 text-black shadow-lg" : "text-muted-fg hover:text-foreground"
+                            mode === 'visual' ? "bg-primary text-white shadow-lg" : "text-muted-fg hover:text-foreground"
                         )}
                     >
                         <Edit3 size={14} strokeWidth={3} /> Visual Editor
@@ -57,7 +57,7 @@ export default function DataEditor() {
                         onClick={() => setMode('json')}
                         className={cn(
                             "flex items-center gap-2 px-6 py-2 rounded-xl text-xs font-black transition-all",
-                            mode === 'json' ? "bg-green-500 text-black shadow-lg" : "text-muted-fg hover:text-foreground"
+                            mode === 'json' ? "bg-primary text-white shadow-lg" : "text-muted-fg hover:text-foreground"
                         )}
                     >
                         <Code2 size={14} strokeWidth={3} /> Advanced (JSON)
@@ -68,7 +68,7 @@ export default function DataEditor() {
                     {mode === 'json' && (
                         <button
                             onClick={copyToClipboard}
-                            className="p-2 text-muted-fg hover:text-foreground hover:bg-white/5 rounded-lg transition-colors"
+                            className="p-2 text-muted-fg hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors"
                             title="Copy JSON"
                         >
                             <Copy size={16} />
@@ -82,7 +82,7 @@ export default function DataEditor() {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar bg-black/20">
+            <div className="flex-1 overflow-y-auto custom-scrollbar bg-muted">
                 {mode === 'visual' ? (
                     <div className="p-8">
                         <VisualEditor />
@@ -92,7 +92,7 @@ export default function DataEditor() {
                         <textarea
                             value={jsonText}
                             onChange={handleTextChange}
-                            className="absolute inset-0 w-full h-full p-8 bg-transparent text-slate-300 text-sm leading-relaxed focus:outline-none resize-none scroll-smooth selection:bg-green-500/30 selection:text-white"
+                            className="absolute inset-0 w-full h-full p-8 bg-transparent text-foreground text-sm leading-relaxed focus:outline-none resize-none scroll-smooth selection:bg-green-500/30 selection:text-white"
                             spellCheck={false}
                             placeholder="Paste your JSON here..."
                         />

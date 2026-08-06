@@ -3,8 +3,9 @@ import { useAppSelector, useAppDispatch } from '@/lib/hooks';
 import { resetExam } from '@/lib/features/exam/examSlice';
 import QuestionCard from './QuestionCard';
 import DataEditor from './DataEditor';
-import { BookOpen, Calendar, Layers, Hash, RefreshCcw, CheckCircle2, Edit3, ChevronRight, LayoutDashboard, Image as ImageIcon, Save, Check, AlertCircle } from 'lucide-react';
-import { examService } from '@/services/examService';
+import { BookOpen, Calendar, Layers, Hash, RefreshCcw, CheckCircle2, Edit3, ChevronRight, LayoutDashboard, Image as ImageIcon, Save, Check, AlertCircle, Copy } from 'lucide-react';
+import { examService, DuplicateExamError } from '@/services/examService';
+import { getPDFFromLocal } from '@/lib/pdfStorage';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -14,20 +15,37 @@ export default function ExamDashboard() {
     const router = useRouter();
     const [showEditor, setShowEditor] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error' | 'duplicate'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
 
     const handleSaveToDatabase = async () => {
         setIsSaving(true);
         setSaveStatus('idle');
         try {
+            if (!data) throw new Error("No exam data to save");
             await examService.saveExam(data);
+
+            // Upload the PDF to storage in the background
+            try {
+                const pdfBlob = await getPDFFromLocal();
+                if (pdfBlob) {
+                    const pdfFile = new File([pdfBlob], `${data.subject}_${data.year}_paper${data.paper}.pdf`, { type: 'application/pdf' });
+                    await examService.uploadPdf(data.subject, data.year, data.paper, pdfFile);
+                }
+            } catch (pdfErr) {
+                console.warn('PDF upload failed (exam data was saved):', pdfErr);
+            }
+
             setSaveStatus('success');
-            // Reset status after a few seconds
             setTimeout(() => setSaveStatus('idle'), 5000);
         } catch (error: any) {
             setSaveStatus('error');
-            setErrorMessage(error.message || 'Failed to save exam data');
+            if (error instanceof DuplicateExamError) {
+                setErrorMessage(error.message);
+                setSaveStatus('duplicate');
+            } else {
+                setErrorMessage(error.message || 'Failed to save exam data');
+            }
         } finally {
             setIsSaving(false);
         }
@@ -76,8 +94,8 @@ export default function ExamDashboard() {
                                     className={cn(
                                         "flex items-center gap-2 px-6 py-3 font-semibold rounded-2xl border transition-all active:scale-95",
                                         showEditor
-                                            ? "bg-green-500 text-black border-green-500 shadow-lg shadow-green-500/20"
-                                            : "bg-white/5 hover:bg-white/10 text-slate-100 border-white/10"
+                                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                                            : "bg-muted/50 hover:bg-muted text-foreground border-border-subtle"
                                     )}
                                 >
                                     <Edit3 size={18} />
@@ -85,7 +103,7 @@ export default function ExamDashboard() {
                                 </button>
                                 <button
                                     onClick={() => router.push('/image-extraction')}
-                                    className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 text-slate-100 font-semibold rounded-2xl border border-white/10 transition-all active:scale-95"
+                                    className="flex items-center gap-2 px-6 py-3 bg-muted/50 hover:bg-muted text-foreground font-semibold rounded-2xl border border-border-subtle transition-all active:scale-95"
                                 >
                                     <ImageIcon size={18} />
                                     Extract Images
@@ -97,25 +115,29 @@ export default function ExamDashboard() {
                                         "flex items-center gap-2 px-6 py-3 font-semibold rounded-2xl border transition-all active:scale-95",
                                         saveStatus === 'success'
                                             ? "bg-green-500/10 text-green-500 border-green-500/20"
-                                            : saveStatus === 'error'
-                                                ? "bg-red-500/10 text-red-500 border-red-500/20"
-                                                : "bg-green-500 text-black border-green-500 shadow-lg shadow-green-500/20 hover:bg-green-600"
+                                            : saveStatus === 'duplicate'
+                                                ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                                                : saveStatus === 'error'
+                                                    ? "bg-red-500/10 text-red-500 border-red-500/20"
+                                                    : "bg-primary text-white border-primary shadow-lg shadow-primary/20 hover:opacity-90"
                                     )}
                                 >
                                     {isSaving ? (
                                         <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
                                     ) : saveStatus === 'success' ? (
                                         <Check size={18} />
+                                    ) : saveStatus === 'duplicate' ? (
+                                        <Copy size={18} />
                                     ) : saveStatus === 'error' ? (
                                         <AlertCircle size={18} />
                                     ) : (
                                         <Save size={18} />
                                     )}
-                                    {isSaving ? "Saving..." : saveStatus === 'success' ? "Saved" : saveStatus === 'error' ? "Error" : "Save to DB"}
+                                    {isSaving ? "Saving..." : saveStatus === 'success' ? "Saved" : saveStatus === 'duplicate' ? "Already Exists" : saveStatus === 'error' ? "Error" : "Save to DB"}
                                 </button>
                                 <button
                                     onClick={() => dispatch(resetExam())}
-                                    className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 text-slate-100 font-semibold rounded-2xl border border-white/10 transition-all active:scale-95"
+                                    className="flex items-center gap-2 px-6 py-3 bg-muted/50 hover:bg-muted text-foreground font-semibold rounded-2xl border border-border-subtle transition-all active:scale-95"
                                 >
                                     <RefreshCcw size={18} />
                                     New
@@ -125,6 +147,12 @@ export default function ExamDashboard() {
 
                         {saveStatus === 'error' && (
                             <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-xs font-medium animate-in fade-in slide-in-from-top-2">
+                                {errorMessage}
+                            </div>
+                        )}
+
+                        {saveStatus === 'duplicate' && (
+                            <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-500 text-xs font-medium animate-in fade-in slide-in-from-top-2">
                                 {errorMessage}
                             </div>
                         )}

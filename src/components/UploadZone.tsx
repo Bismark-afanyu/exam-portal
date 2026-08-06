@@ -4,9 +4,9 @@ import { useState, useRef } from 'react';
 import { useAppDispatch } from '@/lib/hooks';
 import { uploadStart, uploadSuccess, uploadFailure, uploadProgress as setUploadProgress, setPdfUrl } from '@/lib/features/exam/examSlice';
 import { Upload, FileText, X, AlertCircle, Sparkles } from 'lucide-react';
-import axios from 'axios';
 import { cn } from '@/lib/utils';
 import { savePDFToLocal } from '@/lib/pdfStorage';
+import { apiClient } from '@/services/authService';
 
 export default function UploadZone() {
   const [isDragging, setIsDragging] = useState(false);
@@ -53,7 +53,7 @@ export default function UploadZone() {
     formData.append('file', selectedFile);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/exams/upload', formData, {
+      const response = await apiClient.post('/exams/upload', formData, {
         onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 100));
           dispatch(setUploadProgress(progress));
@@ -119,7 +119,7 @@ export default function UploadZone() {
             </button>
           </div>
           <button
-            className="w-full py-5 bg-green-500 hover:bg-green-600 text-white dark:text-black font-black text-xl rounded-2xl transition-all shadow-[0_10px_30px_-10px_rgba(34,197,94,0.3)] hover:shadow-[0_15px_35px_-10px_rgba(34,197,94,0.45)] hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full py-5 bg-primary hover:opacity-90 text-white font-black text-xl rounded-2xl transition-all shadow-[0_10px_30px_-10px_rgba(34,197,94,0.3)] hover:shadow-[0_15px_35px_-10px_rgba(34,197,94,0.45)] hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2"
             onClick={handleUpload}
           >
             <Sparkles size={22} className="fill-current" />

@@ -1,18 +1,30 @@
 'use client';
 
-import { LayoutDashboard, FileText, Settings, HelpCircle, FilePlus2, PieChart, Sun, Moon, X, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, FilePlus2, PieChart, Sun, Moon, X, ChevronLeft, ChevronRight, BookOpen, FileCheck, Sparkles, Video, Users, BrainCircuit, Trophy, Flame, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { useAppSelector, useAppDispatch } from '@/lib/hooks';
+import { logoutUser } from '@/lib/features/user/userSlice';
 
-const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
+const adminMenuItems: { icon: any; label: string; href: string; badge?: string }[] = [
+    { icon: LayoutDashboard, label: 'Admin Dashboard', href: '/dashboard' },
     { icon: FilePlus2, label: 'New Extraction', href: '/new-extraction' },
     { icon: FileText, label: 'My Files', href: '/my-files' },
     { icon: PieChart, label: 'Analytics', href: '/analytics' },
+    { icon: Users, label: 'Team', href: '/team' },
     { icon: Settings, label: 'Settings', href: '/settings' },
-    { icon: HelpCircle, label: 'Help & Support', href: '/help' },
+];
+
+const studentMenuItems: { icon: any; label: string; href: string; badge?: string }[] = [
+    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
+    { icon: FileCheck, label: 'Junes', href: '/student/junes' },
+    { icon: Sparkles, label: 'AI Tutor', href: '/student/chat', badge: 'New' },
+    { icon: Video, label: 'Videos', href: '/student/videos' },
+    { icon: Users, label: 'Community', href: '/student/community' },
+    { icon: Trophy, label: 'Achievements', href: '/student/achievements' },
+    { icon: Settings, label: 'Settings', href: '/student/settings' },
 ];
 
 interface SidebarProps {
@@ -25,8 +37,17 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
+    const dispatch = useAppDispatch();
+    const { role, name } = useAppSelector((state) => state.user);
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+
+    const menuItems: { icon: any; label: string; href: string; badge?: string }[] =
+        role === 'admin'
+            ? adminMenuItems
+            : role === 'editor'
+                ? adminMenuItems.filter((item) => item.href !== '/team')
+                : studentMenuItems;
 
     useEffect(() => {
         setMounted(true);
@@ -39,60 +60,62 @@ export default function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse
         }
     };
 
+    const handleLogout = () => {
+        const target = role === 'admin' ? '/admin' : '/login';
+        dispatch(logoutUser()).then(() => router.push(target));
+    };
+
+    const streakDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const streakActive = [true, true, true, true, true, false, false];
+
     return (
         <>
-            {/* Mobile Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden transition-opacity"
                     onClick={onClose}
                 />
             )}
 
             <aside className={cn(
-                "fixed lg:sticky top-0 left-0 z-50 h-screen bg-background/80 border-r border-border-subtle flex flex-col pt-8 backdrop-blur-xl transition-all duration-300 ease-in-out",
+                "fixed lg:sticky top-0 left-0 z-50 h-screen bg-card-bg border-r border-border-subtle flex flex-col transition-all duration-300 ease-in-out",
                 isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-                isCollapsed ? "lg:w-20" : "lg:w-64"
+                isCollapsed ? "lg:w-[72px]" : "lg:w-60"
             )}>
+                {/* Logo */}
                 <div className={cn(
-                    "px-6 mb-12 flex items-center justify-between transition-all duration-300",
-                    isCollapsed ? "lg:px-0 lg:flex-col lg:gap-6" : "lg:px-6 lg:flex-row"
+                    "px-5 h-16 flex items-center justify-between border-b border-border-subtle",
+                    isCollapsed && "lg:justify-center lg:px-0"
                 )}>
                     <div className={cn(
-                        "flex items-center gap-3 overflow-hidden transition-all duration-300",
+                        "flex items-center gap-2.5 overflow-hidden transition-all duration-300",
                         isCollapsed && "lg:justify-center lg:w-full"
                     )}>
-                        <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
-                            <span className="text-black font-black text-xl">Ŋ</span>
+                        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
+                            <span className="text-white font-bold text-sm">n</span>
                         </div>
-                        <span className={cn(
-                            "text-xl font-normal tracking-tight text-foreground transition-all duration-300 whitespace-nowrap font-untitled serif",
-                            isCollapsed && "lg:opacity-0 lg:w-0"
-                        )}>Ŋwà'</span>
+                        {!isCollapsed && (
+                            <span className="text-base font-semibold tracking-tight text-foreground whitespace-nowrap">Ŋwà'</span>
+                        )}
                     </div>
-
                     <div className={cn(
-                        "flex items-center gap-1 transition-all duration-300",
-                        isCollapsed && "lg:w-full lg:justify-center"
+                        "flex items-center transition-all duration-300",
+                        isCollapsed && "lg:hidden"
                     )}>
-                        {/* Desktop Collapse Toggle */}
                         <button
                             onClick={onToggleCollapse}
-                            className="hidden lg:flex p-2 text-muted-fg hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+                            className="hidden lg:flex p-1.5 text-muted-fg hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                         >
-                            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+                            <ChevronLeft size={16} />
                         </button>
-
-                        <button
-                            onClick={onClose}
-                            className="lg:hidden p-2 text-muted-fg hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
-                        >
-                            <X size={20} />
+                        <button onClick={onClose} className="lg:hidden p-1.5 text-muted-fg hover:text-foreground rounded-lg">
+                            <X size={16} />
                         </button>
                     </div>
                 </div>
 
-                <nav className="flex-1 px-4 space-y-2 overflow-x-hidden">
+                {/* Navigation */}
+                <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
                     {menuItems.map((item, index) => {
                         const isActive = pathname === item.href;
                         return (
@@ -100,70 +123,89 @@ export default function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse
                                 key={index}
                                 onClick={() => handleNavigation(item.href)}
                                 className={cn(
-                                    "flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 group text-left relative",
+                                    "flex items-center gap-3 px-3 py-2 w-full rounded-lg transition-all duration-150 text-left relative",
                                     isActive
-                                        ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                                        : "text-muted-fg hover:text-foreground hover:bg-secondary",
+                                        ? "bg-primary/10 text-primary font-medium"
+                                        : "text-muted-fg hover:text-foreground hover:bg-muted",
                                     isCollapsed && "lg:px-0 lg:justify-center"
                                 )}
                             >
-                                <item.icon size={20} className={cn("shrink-0", isActive && "text-green-500")} />
+                                <item.icon size={18} className={cn("shrink-0", isActive && "text-primary")} />
                                 <span className={cn(
-                                    "font-semibold text-sm transition-all duration-300 whitespace-nowrap",
+                                    "text-sm transition-all duration-300 whitespace-nowrap",
                                     isCollapsed && "lg:opacity-0 lg:w-0"
                                 )}>
                                     {item.label}
                                 </span>
-                                {!isCollapsed && index === 2 && (
-                                    <span className="ml-auto bg-green-500 text-black text-[10px] font-black px-1.5 py-0.5 rounded-md">3</span>
+                                {item.badge && !isCollapsed && (
+                                    <span className="ml-auto bg-primary text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                                        {item.badge}
+                                    </span>
                                 )}
-                                {isCollapsed && isActive && (
-                                    <div className="hidden lg:block absolute left-0 w-1 h-6 bg-green-500 rounded-r-full" />
+                                {isActive && !isCollapsed && (
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-r-full hidden lg:block" />
                                 )}
                             </button>
                         );
                     })}
                 </nav>
 
+                {/* Bottom Section */}
                 <div className={cn(
-                    "p-6 space-y-4 transition-all duration-300",
-                    isCollapsed ? "lg:p-4" : "lg:p-6"
+                    "p-3 space-y-2 border-t border-border-subtle",
+                    isCollapsed && "lg:p-2"
                 )}>
-                    <button
-                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                        className={cn(
-                            "flex items-center gap-3 px-4 py-3 w-full rounded-xl bg-secondary border border-border-subtle text-foreground hover:bg-secondary/80 transition-all group overflow-hidden",
-                            isCollapsed && "lg:px-0 lg:justify-center"
-                        )}
-                    >
-                        {mounted && (
-                            <div className="shrink-0">
-                                {theme === 'dark' ? (
-                                    <Sun size={20} className="text-amber-400" />
-                                ) : (
-                                    <Moon size={20} className="text-indigo-500" />
-                                )}
+                    {/* Study Streak Card */}
+                    {!isCollapsed && role === 'student' && (
+                        <div className="p-3 rounded-xl bg-muted">
+                            <div className="flex items-center gap-1.5 mb-1">
+                                <span className="text-sm">Study Streak 🔥</span>
                             </div>
-                        )}
-                        <span className={cn(
-                            "font-semibold text-sm transition-all duration-300 whitespace-nowrap",
-                            isCollapsed && "lg:opacity-0 lg:w-0"
-                        )}>
-                            {mounted ? (theme === 'dark' ? 'Light Mode' : 'Dark Mode') : 'Theme'}
-                        </span>
-                    </button>
-
-                    {!isCollapsed && (
-                        <div className="glass p-4 rounded-2xl bg-green-500/5 border border-green-500/10 animate-fade-in transition-all">
-                            <div className="text-xs font-bold text-green-500 uppercase tracking-widest mb-1">Status</div>
-                            <div className="text-sm font-semibold text-foreground mb-2">Alpha v0.1</div>
-                            <div className="w-full bg-secondary h-1.5 rounded-full overflow-hidden">
-                                <div className="bg-green-500 h-full w-2/3 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+                            <div className="text-2xl font-bold text-foreground leading-tight">14 <span className="text-xs font-normal text-muted-fg">days</span></div>
+                            <p className="text-[11px] text-muted-fg mt-1">Keep it up! You're doing great.</p>
+                            <div className="flex gap-1.5 mt-2.5">
+                                {streakDays.map((day, i) => (
+                                    <div
+                                        key={i}
+                                        className={cn(
+                                            "w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-medium",
+                                            streakActive[i]
+                                                ? "bg-primary text-white"
+                                                : "bg-border-subtle text-muted-fg"
+                                        )}
+                                    >
+                                        {day}
+                                    </div>
+                                ))}
                             </div>
+                            <button className="w-full mt-3 py-1.5 text-xs font-medium text-foreground bg-card-bg border border-border-subtle rounded-lg hover:bg-secondary transition-colors">
+                                View Calendar
+                            </button>
                         </div>
                     )}
+
+                    {/* Log out & Theme */}
+                    <div className={cn("flex gap-1.5", isCollapsed && "flex-col")}>
+                        <button
+                            onClick={handleLogout}
+                            className={cn(
+                                "flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-muted text-muted-fg hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-all text-xs font-medium flex-1",
+                                isCollapsed && "lg:px-0 lg:justify-center lg:flex-none"
+                            )}
+                            title="Log out"
+                        >
+                            <LogOut size={16} className="shrink-0" />
+                            {!isCollapsed && <span>Log out</span>}
+                        </button>
+                        <button
+                            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                            className="p-2 rounded-lg bg-muted text-muted-fg hover:text-foreground transition-all"
+                        >
+                            {mounted && (theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />)}
+                        </button>
+                    </div>
                 </div>
             </aside>
         </>
     );
-}       
+}
