@@ -1,0 +1,15 @@
+.git/
+.gitignore
+.env*
+*.md
+node_modules/
+.next/
+out/
+build/
+Dockerfile
+.dockerignore
+.vscode/
+.idea/
+.DS_Store
+npm-debug.log*
+*.tsbuildinfo
