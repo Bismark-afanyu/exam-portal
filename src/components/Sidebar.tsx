@@ -61,7 +61,7 @@ export default function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse
     };
 
     const handleLogout = () => {
-        const target = role === 'admin' ? '/admin' : '/login';
+        const target = role === 'admin' || role === 'editor' ? '/admin' : '/login';
         dispatch(logoutUser()).then(() => router.push(target));
     };
 

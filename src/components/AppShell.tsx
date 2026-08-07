@@ -29,7 +29,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         setUnauthorizedHandler(() => {
             dispatch(logoutUser());
-            router.replace(role === 'admin' ? '/admin' : '/login');
+            router.replace(role === 'admin' || role === 'editor' ? '/admin' : '/login');
         });
         return () => setUnauthorizedHandler(null);
     }, [dispatch, router, role]);

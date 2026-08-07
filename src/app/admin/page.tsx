@@ -31,9 +31,9 @@ export default function AdminLoginPage() {
     setError('');
     try {
       const user = await dispatch(loginUser({ email, password })).unwrap();
-      if (user.role !== 'admin') {
+      if (user.role !== 'admin' && user.role !== 'editor') {
         dispatch(logoutUser());
-        setError('This portal is for admins only. Please use the student login instead.');
+        setError('This portal is for team members only. Please use the student login instead.');
         return;
       }
       router.push('/dashboard');

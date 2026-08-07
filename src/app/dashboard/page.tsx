@@ -14,7 +14,7 @@ export default function RootPage() {
 
   return (
     <div className="w-full min-h-full">
-      {role === 'admin' ? <AdminDashboard /> : <StudentDashboard />}
+      {role === 'admin' || role === 'editor' ? <AdminDashboard /> : <StudentDashboard />}
     </div>
   );
 }
