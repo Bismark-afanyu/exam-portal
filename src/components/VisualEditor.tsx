@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { updateFileData, ExamPaperData, Question, SubQuestion } from '@/lib/features/exam/examSlice';
+import { updateFileData, ExamPaperData, Question, SubQuestion, SubSubQuestion } from '@/lib/features/exam/examSlice';
 import { Plus, Trash2, ChevronDown, ChevronRight, Hash, Book, Calendar, Layers, FileText, LayoutList, BookOpen, X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -256,7 +256,7 @@ export default function VisualEditor() {
                                             <div className="text-[10px] font-bold text-muted-fg uppercase ml-2">Sub-sections</div>
                                             <button
                                                 onClick={() => {
-                                                    const sub = [...(q.subquestions || []), { subquestion_identifier: '', text: '', marks: 0 }];
+                                                    const sub = [...(q.subquestions || []), { subquestion_identifier: '', text: '', marks: 0, sub_subquestions: [] }];
                                                     handleQuestionUpdate(idx, { subquestions: sub, has_subquestions: true });
                                                 }}
                                                 className="text-[10px] font-bold text-green-500 hover:text-green-400 flex items-center gap-1"
@@ -266,49 +266,140 @@ export default function VisualEditor() {
                                         </div>
                                         <div className="space-y-2">
                                             {q.subquestions?.map((sq, sidx) => (
-                                                <div key={sidx} className="bg-muted/50 border border-border-subtle p-3 rounded-xl flex gap-3 items-start group/sub">
-                                                    <input
-                                                        type="text"
-                                                        value={sq.subquestion_identifier}
-                                                        onChange={(e) => {
-                                                            const news = [...q.subquestions];
-                                                            news[sidx] = { ...sq, subquestion_identifier: e.target.value };
-                                                            handleQuestionUpdate(idx, { subquestions: news });
-                                                        }}
-                                                        placeholder="id"
-                                                        className="w-12 bg-muted border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
-                                                    />
-                                                    <textarea
-                                                        value={sq.text}
-                                                        onChange={(e) => {
-                                                            const news = [...q.subquestions];
-                                                            news[sidx] = { ...sq, text: e.target.value };
-                                                            handleQuestionUpdate(idx, { subquestions: news });
-                                                        }}
-                                                        placeholder="Part text..."
-                                                        className="flex-1 bg-muted border border-border-subtle rounded-lg px-3 py-1.5 text-xs h-16 focus:outline-none resize-none"
-                                                    />
-                                                    <div className="flex flex-col gap-2">
+                                                <div key={sidx} className="bg-muted/50 border border-border-subtle p-3 rounded-xl group/sub">
+                                                    <div className="flex gap-3 items-start">
                                                         <input
-                                                            type="number"
-                                                            value={sq.marks}
+                                                            type="text"
+                                                            value={sq.subquestion_identifier}
                                                             onChange={(e) => {
                                                                 const news = [...q.subquestions];
-                                                                news[sidx] = { ...sq, marks: parseInt(e.target.value) || 0 };
+                                                                news[sidx] = { ...sq, subquestion_identifier: e.target.value };
                                                                 handleQuestionUpdate(idx, { subquestions: news });
                                                             }}
-                                                            placeholder="Mks"
-                                                            className="w-16 bg-muted border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                                                            placeholder="id"
+                                                            className="w-12 bg-muted border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
                                                         />
-                                                        <button
-                                                            onClick={() => {
-                                                                const news = q.subquestions.filter((_, i) => i !== sidx);
-                                                                handleQuestionUpdate(idx, { subquestions: news, has_subquestions: news.length > 0 });
+                                                        <textarea
+                                                            value={sq.text}
+                                                            onChange={(e) => {
+                                                                const news = [...q.subquestions];
+                                                                news[sidx] = { ...sq, text: e.target.value };
+                                                                handleQuestionUpdate(idx, { subquestions: news });
                                                             }}
-                                                            className="p-1.5 text-muted-fg hover:text-red-500"
-                                                        >
-                                                            <Trash2 size={12} />
-                                                        </button>
+                                                            placeholder="Part text..."
+                                                            className="flex-1 bg-muted border border-border-subtle rounded-lg px-3 py-1.5 text-xs h-16 focus:outline-none resize-none"
+                                                        />
+                                                        <div className="flex flex-col gap-2">
+                                                            <input
+                                                                type="number"
+                                                                value={sq.marks}
+                                                                onChange={(e) => {
+                                                                    const news = [...q.subquestions];
+                                                                    news[sidx] = { ...sq, marks: parseInt(e.target.value) || 0 };
+                                                                    handleQuestionUpdate(idx, { subquestions: news });
+                                                                }}
+                                                                placeholder="Mks"
+                                                                className="w-16 bg-muted border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                                                            />
+                                                            <button
+                                                                onClick={() => {
+                                                                    const news = q.subquestions.filter((_, i) => i !== sidx);
+                                                                    handleQuestionUpdate(idx, { subquestions: news, has_subquestions: news.length > 0 });
+                                                                }}
+                                                                className="p-1.5 text-muted-fg hover:text-red-500"
+                                                            >
+                                                                <Trash2 size={12} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {sq.image_url && (
+                                                        <div className="mt-3 flex items-center gap-2">
+                                                            <img src={sq.image_url} alt="part" className="w-10 h-10 rounded-lg object-cover border border-border-subtle" />
+                                                            <input
+                                                                type="text"
+                                                                value={sq.image_url}
+                                                                onChange={(e) => {
+                                                                    const news = [...q.subquestions];
+                                                                    news[sidx] = { ...sq, image_url: e.target.value };
+                                                                    handleQuestionUpdate(idx, { subquestions: news });
+                                                                }}
+                                                                placeholder="image_url"
+                                                                className="flex-1 bg-muted border border-border-subtle rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                                                            />
+                                                        </div>
+                                                    )}
+
+                                                    <div className="mt-3 space-y-2 pl-4 border-l-2 border-dashed border-border-subtle">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="text-[10px] font-bold text-muted-fg uppercase ml-2">Deeper Parts (e.g. 1(a)(i))</div>
+                                                            <button
+                                                                onClick={() => {
+                                                                    const news = [...q.subquestions];
+                                                                    const ssq = { sub_subquestion_identifier: '', text: '', marks: 0 };
+                                                                    news[sidx] = { ...sq, sub_subquestions: [...(sq.sub_subquestions || []), ssq] };
+                                                                    handleQuestionUpdate(idx, { subquestions: news });
+                                                                }}
+                                                                className="text-[10px] font-bold text-green-500 hover:text-green-400 flex items-center gap-1"
+                                                            >
+                                                                <Plus size={10} /> Add Sub-Part
+                                                            </button>
+                                                        </div>
+                                                        {sq.sub_subquestions?.map((ssq, ssidx) => (
+                                                            <div key={ssidx} className="flex gap-3 items-start bg-muted/40 border border-border-subtle p-2 rounded-lg">
+                                                                <input
+                                                                    type="text"
+                                                                    value={ssq.sub_subquestion_identifier}
+                                                                    onChange={(e) => {
+                                                                        const news = [...q.subquestions];
+                                                                        const nss = [...(sq.sub_subquestions || [])];
+                                                                        nss[ssidx] = { ...ssq, sub_subquestion_identifier: e.target.value };
+                                                                        news[sidx] = { ...sq, sub_subquestions: nss };
+                                                                        handleQuestionUpdate(idx, { subquestions: news });
+                                                                    }}
+                                                                    placeholder="id"
+                                                                    className="w-12 bg-muted border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                                                                />
+                                                                <textarea
+                                                                    value={ssq.text}
+                                                                    onChange={(e) => {
+                                                                        const news = [...q.subquestions];
+                                                                        const nss = [...(sq.sub_subquestions || [])];
+                                                                        nss[ssidx] = { ...ssq, text: e.target.value };
+                                                                        news[sidx] = { ...sq, sub_subquestions: nss };
+                                                                        handleQuestionUpdate(idx, { subquestions: news });
+                                                                    }}
+                                                                    placeholder="Sub-part text..."
+                                                                    className="flex-1 bg-muted border border-border-subtle rounded-lg px-3 py-1.5 text-xs h-14 focus:outline-none resize-none"
+                                                                />
+                                                                <div className="flex flex-col gap-2">
+                                                                    <input
+                                                                        type="number"
+                                                                        value={ssq.marks}
+                                                                        onChange={(e) => {
+                                                                            const news = [...q.subquestions];
+                                                                            const nss = [...(sq.sub_subquestions || [])];
+                                                                            nss[ssidx] = { ...ssq, marks: parseInt(e.target.value) || 0 };
+                                                                            news[sidx] = { ...sq, sub_subquestions: nss };
+                                                                            handleQuestionUpdate(idx, { subquestions: news });
+                                                                        }}
+                                                                        placeholder="Mks"
+                                                                        className="w-14 bg-muted border border-border-subtle rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                                                                    />
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const news = [...q.subquestions];
+                                                                            const nss = (sq.sub_subquestions || []).filter((_, i) => i !== ssidx);
+                                                                            news[sidx] = { ...sq, sub_subquestions: nss };
+                                                                            handleQuestionUpdate(idx, { subquestions: news });
+                                                                        }}
+                                                                        className="p-1.5 text-muted-fg hover:text-red-500"
+                                                                    >
+                                                                        <Trash2 size={12} />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 </div>
                                             ))}

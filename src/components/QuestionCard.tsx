@@ -167,6 +167,43 @@ export default function QuestionCard({ question }: QuestionCardProps) {
                                 <div className="text-muted-fg">
                                     {renderText(sq.text, true)}
                                 </div>
+
+                                {sq.image_url && (
+                                    <div className="mt-4 rounded-2xl overflow-hidden border border-border-subtle bg-muted">
+                                        <img
+                                            src={sq.image_url}
+                                            alt={`Image for part (${sq.subquestion_identifier})`}
+                                            className="max-w-full h-auto mx-auto"
+                                        />
+                                    </div>
+                                )}
+
+                                {sq.sub_subquestions && sq.sub_subquestions.length > 0 && (
+                                    <div className="mt-4 space-y-3 pl-4 border-l-2 border-dashed border-border-subtle">
+                                        {sq.sub_subquestions.map((ssq, j) => (
+                                            <div key={j} className="p-3 rounded-xl bg-muted/40 border border-border-subtle">
+                                                <div className="flex justify-between items-center mb-1.5">
+                                                    <span className="text-xs font-black text-green-600">({sq.subquestion_identifier})({ssq.sub_subquestion_identifier})</span>
+                                                    <span className="text-[10px] font-bold text-muted-fg bg-secondary px-2 py-0.5 rounded-full border border-border-subtle">
+                                                        {ssq.marks || 0} Marks
+                                                    </span>
+                                                </div>
+                                                <div className="text-sm text-muted-fg">
+                                                    {renderText(ssq.text, true)}
+                                                </div>
+                                                {ssq.image_url && (
+                                                    <div className="mt-3 rounded-xl overflow-hidden border border-border-subtle bg-muted">
+                                                        <img
+                                                            src={ssq.image_url}
+                                                            alt={`Image for part (${sq.subquestion_identifier})(${ssq.sub_subquestion_identifier})`}
+                                                            className="max-w-full h-auto mx-auto"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

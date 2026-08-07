@@ -280,28 +280,88 @@ export default function PaperPracticePage() {
 
                 {/* Sub-questions */}
                 {question.has_subquestions && question.subquestions?.length > 0 && (
-                  <div className="mt-5 space-y-3 pl-6 md:pl-10">
+                  <div className="mt-5 space-y-4 pl-6 md:pl-10">
                     {question.subquestions.map((sq, i) => (
-                      <div key={i} className="flex gap-3">
-                        <span className={cn(
-                          "font-bold text-sm shrink-0 mt-0.5",
-                          isALevel ? "text-green-700" : "text-gray-600"
-                        )}>
-                          ({sq.subquestion_identifier})
-                        </span>
-                        <div className="flex-1">
-                          <div className={cn(
-                            "text-[15px] md:text-base leading-[1.8]",
-                            isALevel ? "text-green-900/80" : "text-gray-700"
-                          )}>
-                            <PaperQuestionText text={sq.text} isALevel={!!isALevel} />
-                          </div>
+                      <div key={i}>
+                        <div className="flex gap-3">
                           <span className={cn(
-                            "text-xs font-bold mt-1 inline-block",
-                            isALevel ? "text-green-600/60" : "text-gray-400"
+                            "font-bold text-sm shrink-0 mt-0.5",
+                            isALevel ? "text-green-700" : "text-gray-600"
                           )}>
-                            [{sq.marks || 0} marks]
+                            ({sq.subquestion_identifier})
                           </span>
+                          <div className="flex-1">
+                            <div className={cn(
+                              "text-[15px] md:text-base leading-[1.8]",
+                              isALevel ? "text-green-900/80" : "text-gray-700"
+                            )}>
+                              <PaperQuestionText text={sq.text} isALevel={!!isALevel} />
+                            </div>
+                            <span className={cn(
+                              "text-xs font-bold mt-1 inline-block",
+                              isALevel ? "text-green-600/60" : "text-gray-400"
+                            )}>
+                              [{sq.marks || 0} marks]
+                            </span>
+
+                            {/* Image that belongs to this sub-question */}
+                            {sq.image_url && (
+                              <div className={cn(
+                                "my-4 rounded-2xl overflow-hidden border",
+                                isALevel ? "border-green-200 bg-green-50" : "border-gray-200 bg-gray-50"
+                              )}>
+                                <img
+                                  src={sq.image_url}
+                                  alt={`Figure for part (${sq.subquestion_identifier})`}
+                                  className="max-w-full h-auto mx-auto"
+                                />
+                              </div>
+                            )}
+
+                            {/* Deeper sub-sub-questions (e.g., 1(a)(iii)) */}
+                            {sq.sub_subquestions && sq.sub_subquestions.length > 0 && (
+                              <div className="mt-4 space-y-4 pl-5 md:pl-8 border-l-2 border-dashed">
+                                {sq.sub_subquestions.map((ssq, j) => (
+                                  <div key={j} className="flex gap-3">
+                                    <span className={cn(
+                                      "font-bold text-sm shrink-0 mt-0.5",
+                                      isALevel ? "text-green-700" : "text-gray-600"
+                                    )}>
+                                      ({ssq.sub_subquestion_identifier})
+                                    </span>
+                                    <div className="flex-1">
+                                      <div className={cn(
+                                        "text-[15px] md:text-base leading-[1.8]",
+                                        isALevel ? "text-green-900/80" : "text-gray-700"
+                                      )}>
+                                        <PaperQuestionText text={ssq.text} isALevel={!!isALevel} />
+                                      </div>
+                                      <span className={cn(
+                                        "text-xs font-bold mt-1 inline-block",
+                                        isALevel ? "text-green-600/60" : "text-gray-400"
+                                      )}>
+                                        [{ssq.marks || 0} marks]
+                                      </span>
+
+                                      {/* Image that belongs to this sub-sub-question */}
+                                      {ssq.image_url && (
+                                        <div className={cn(
+                                          "my-4 rounded-2xl overflow-hidden border",
+                                          isALevel ? "border-green-200 bg-green-50" : "border-gray-200 bg-gray-50"
+                                        )}>
+                                          <img
+                                            src={ssq.image_url}
+                                            alt={`Figure for part (${sq.subquestion_identifier})(${ssq.sub_subquestion_identifier})`}
+                                            className="max-w-full h-auto mx-auto"
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}

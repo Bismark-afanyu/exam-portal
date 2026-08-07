@@ -23,6 +23,8 @@ export default function ImageExtractionPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [currentSelection, setCurrentSelection] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
     const [selectedQuestion, setSelectedQuestion] = useState<string>('');
+    const [selectedSubquestion, setSelectedSubquestion] = useState<string>('');
+    const [selectedSubSubquestion, setSelectedSubSubquestion] = useState<string>('');
     const [isSaving, setIsSaving] = useState(false);
     const [isRecovering, setIsRecovering] = useState(false);
     const [isLinkerOpen, setIsLinkerOpen] = useState(true);
@@ -97,12 +99,16 @@ export default function ImageExtractionPage() {
             // For now, we'll store the data URL in Redux state
             dispatch(associateImage({ 
                 questionNumber: selectedQuestion, 
-                imageUrl: croppedImageData 
+                imageUrl: croppedImageData,
+                subquestionIndex: selectedSubquestion ? Number(selectedSubquestion) : undefined,
+                subSubquestionIndex: selectedSubSubquestion ? Number(selectedSubSubquestion) : undefined,
             }));
 
             // Reset selection and question
             setCurrentSelection(null);
             setSelectedQuestion('');
+            setSelectedSubquestion('');
+            setSelectedSubSubquestion('');
             
         } catch (error) {
             console.error('Error cropping image:', error);
@@ -244,7 +250,11 @@ export default function ImageExtractionPage() {
                             </label>
                             <select
                                 value={selectedQuestion}
-                                onChange={(e) => setSelectedQuestion(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedQuestion(e.target.value);
+                                    setSelectedSubquestion('');
+                                    setSelectedSubSubquestion('');
+                                }}
                                 className="w-full bg-muted border border-border-subtle rounded-2xl px-4 py-4 text-foreground focus:ring-2 focus:ring-green-500/50 transition-all appearance-none cursor-pointer"
                             >
                                 <option value="">Select a question...</option>
@@ -254,6 +264,58 @@ export default function ImageExtractionPage() {
                                     </option>
                                 ))}
                             </select>
+
+                            {(() => {
+                                const question = data?.questions.find((q) => q.question_number === selectedQuestion);
+                                const subquestions = question?.subquestions ?? [];
+                                const subquestion = selectedSubquestion ? subquestions[Number(selectedSubquestion)] : undefined;
+                                const subSubquestions = subquestion?.sub_subquestions ?? [];
+                                return (
+                                    <>
+                                        {subquestions.length > 0 && (
+                                            <div>
+                                                <label className="text-xs font-black uppercase tracking-widest text-muted-fg block mb-2">
+                                                    Sub-Question
+                                                </label>
+                                                <select
+                                                    value={selectedSubquestion}
+                                                    onChange={(e) => {
+                                                        setSelectedSubquestion(e.target.value);
+                                                        setSelectedSubSubquestion('');
+                                                    }}
+                                                    className="w-full bg-muted border border-border-subtle rounded-2xl px-4 py-3 text-foreground focus:ring-2 focus:ring-green-500/50 transition-all appearance-none cursor-pointer"
+                                                >
+                                                    <option value="">Whole question (no sub-part)</option>
+                                                    {subquestions.map((sq, i) => (
+                                                        <option key={i} value={String(i)}>
+                                                            Part ({sq.subquestion_identifier}) {sq.image_url ? '✓' : ''}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )}
+                                        {subquestions.length > 0 && selectedSubquestion !== '' && subSubquestions.length > 0 && (
+                                            <div>
+                                                <label className="text-xs font-black uppercase tracking-widest text-muted-fg block mb-2">
+                                                    Sub-Sub-Question
+                                                </label>
+                                                <select
+                                                    value={selectedSubSubquestion}
+                                                    onChange={(e) => setSelectedSubSubquestion(e.target.value)}
+                                                    className="w-full bg-muted border border-border-subtle rounded-2xl px-4 py-3 text-foreground focus:ring-2 focus:ring-green-500/50 transition-all appearance-none cursor-pointer"
+                                                >
+                                                    <option value="">Whole sub-question (no deeper part)</option>
+                                                    {subSubquestions.map((ssq, j) => (
+                                                        <option key={j} value={String(j)}>
+                                                            ({subquestion?.subquestion_identifier})({ssq.sub_subquestion_identifier}) {ssq.image_url ? '✓' : ''}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )}
+                                    </>
+                                );
+                            })()}
                         </div>
 
                         <div className="pt-4 border-t border-border-subtle">

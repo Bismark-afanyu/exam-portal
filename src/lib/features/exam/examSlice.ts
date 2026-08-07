@@ -1,9 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export interface SubSubQuestion {
+    sub_subquestion_identifier: string;
+    text: string;
+    marks: number;
+    image_url?: string;
+}
+
 export interface SubQuestion {
     subquestion_identifier: string;
     text: string;
     marks: number;
+    image_url?: string;
+    sub_subquestions?: SubSubQuestion[];
 }
 
 export interface Question {
@@ -82,13 +91,31 @@ const examSlice = createSlice({
         setPdfUrl: (state, action: PayloadAction<string>) => {
             state.pdfFileUrl = action.payload;
         },
-        associateImage: (state, action: PayloadAction<{ questionNumber: string; imageUrl: string }>) => {
+        associateImage: (state, action: PayloadAction<{
+            questionNumber: string;
+            imageUrl: string;
+            subquestionIndex?: number;
+            subSubquestionIndex?: number;
+        }>) => {
             state.imageAssociations[action.payload.questionNumber] = action.payload.imageUrl;
             if (state.data) {
                 const question = state.data.questions.find(q => q.question_number === action.payload.questionNumber);
-                if (question) {
-                    question.image_url = action.payload.imageUrl;
+                if (!question) return;
+                if (action.payload.subquestionIndex !== undefined) {
+                    const sq = question.subquestions?.[action.payload.subquestionIndex];
+                    if (sq) {
+                        if (action.payload.subSubquestionIndex !== undefined) {
+                            const ssq = sq.sub_subquestions?.[action.payload.subSubquestionIndex];
+                            if (ssq) {
+                                ssq.image_url = action.payload.imageUrl;
+                                return;
+                            }
+                        }
+                        sq.image_url = action.payload.imageUrl;
+                        return;
+                    }
                 }
+                question.image_url = action.payload.imageUrl;
             }
         },
     },
